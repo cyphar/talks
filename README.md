@@ -7,3 +7,7 @@ presentations.
 
 All of my presentations can be edited, viewed and compiled using entirely free
 software suites for such tasks.
+
+Everything in this repository is licensed under the **Creative Commons BY-SA
+4.0 international license**. The full license text is available in the
+[COPYING](COPYING) file.
