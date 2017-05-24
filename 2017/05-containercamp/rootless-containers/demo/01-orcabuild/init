@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "Running inside /init."
+echo "I am $(id -u) here."
