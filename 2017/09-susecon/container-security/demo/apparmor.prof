@@ -1,0 +1,4 @@
+profile susecon2017 {
+	file,
+	deny /etc/** wx,
+}

@@ -1,0 +1,9 @@
+Here's the set of demo files included in this directory.
+
+.
+├── apparmor-default.conf # AppArmor profile set by default.
+├── apparmor.prof         # Example AppArmor profile used in the demo.
+├── seccomp-default.json  # SECCOMP profile set by default.
+└── seccomp.json          # Example SECCOMP profile used in the demo.
+
+These files are licensed under Apache 2.0.
