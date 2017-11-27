@@ -1,6 +1,7 @@
 Here's the set of demo files included in this directory.
 
 .
+├── DEMO.sh               # "Script" explaining how to do the demos.
 ├── apparmor-default.conf # AppArmor profile set by default.
 ├── apparmor.prof         # Example AppArmor profile used in the demo.
 ├── seccomp-default.json  # SECCOMP profile set by default.
