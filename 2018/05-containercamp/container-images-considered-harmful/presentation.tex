@@ -1,0 +1,125 @@
+% Copyright (c) 2018 Aleksa Sarai <asarai@suse.de>
+% This work is licensed under the Creative Commons Attribution-ShareAlike 4.0
+% International License. To view a copy of this license, visit
+% http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative
+% Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+\documentclass[10pt,aspectratio=169]{beamer}
+\usetheme{metropolis}
+\metroset{background=light}
+\metroset{titleformat=smallcaps}
+
+\usepackage{pbox}
+\usepackage{fontspec}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[math-style=TeX]{unicode-math}
+\usepackage{booktabs}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage{hyperref}
+\usepackage{graphicx}
+\graphicspath{{.}{assets/}}
+
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+
+\title{\textit{Container Images Considered Harmful} \\
+			  {\small I'm sorry, I couldn't resist.}}
+\author{%
+		Aleksa Sarai \\
+		Senior Software Engineer --- SUSE \\
+		\href{mailto:asarai@suse.de}{\small\tt\underline{asarai@suse.de}}}
+
+\date{}
+\institute{}
+
+\begin{document}
+	\begin{frame}[plain,noframenumbering]
+		\begin{tikzpicture}[remember picture,overlay]
+			\node[anchor=north east] at ($(current page.north east) - (-0.3, 0.3)$) {\includegraphics[height=2cm]{man-in-business-suit-levitating}};
+			\node[anchor=south east] at ($(current page.south east) + (-0.3, 0.3)$) {\includegraphics[width=1.6cm]{cc_by_sa}};
+			\node[anchor=south east] at ($(current page.south east) + (-0.13, 0.9)$) {\includegraphics[width=2cm]{talk_qr}};
+			\node[anchor=south west] at ($(current page.south west) + (2.3, 0.3)$) {\includegraphics[height=0.6cm]{oci_logo}};
+			\node[anchor=south west] at ($(current page.south west) + (0.3, 0.3)$) {\includegraphics[height=0.75cm]{suse_logo}};
+		\end{tikzpicture}
+
+		\titlepage%
+	\end{frame}
+
+	\begin{frame}{\textbf{Who is that maniac?} Get him off the stage!}
+		\begin{itemize}
+			\item Wait! Let me explain!
+			\item Effectively every container ecosystem uses \texttt{tar} archives for layers.
+			\begin{itemize}
+				\item And to be frank, they suck \dots ~ a lot.
+			\end{itemize}
+			\item The full rant is about 3 hours long and is \textit{definitely} R-rated.
+			\begin{itemize}
+				\item I'll try to condense it into 5 minutes.
+				\item If you want more grizzly details, buy me a beer.
+			\end{itemize}
+			\item There are lots of other issues with how opaque they are, but we don't have time.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}
+		\vfill
+		\begin{figure}
+			\centering
+				\includegraphics[height=0.85\textheight,width=\linewidth,keepaspectratio]{very_dead_meme}
+			\caption{In my defence, I made this late last night.}
+			\label{fig:my_label}
+		\end{figure}
+	\end{frame}
+
+	\begin{frame}{Why does \texttt{tar} suck?}
+		\begin{itemize}
+			\item Not standardised. At all.
+			\begin{itemize}
+				\item It has three different (effectively incompatible) extension formats.
+				\item They have partially overlapping feature-sets, and different support levels.
+			\end{itemize}
+			\item Order of \texttt{tar} entries is implementation-defined and might not be reproducible.
+			\begin{itemize}
+				\item GNU \texttt{tar} generates different archives to Go's \texttt{archive/tar} with trailing bits.
+				\item Go 1.10's \texttt{archive/tar} creates slightly different archives to Go 1.9's.
+			\end{itemize}
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Why does \texttt{tar} extraction suck?}
+		\begin{itemize}
+			\item Each entry is stored one-after-another.
+			\begin{itemize}
+				\item Finding the header and contents of a particular file requires a linear scan.
+			\end{itemize}
+			\item \textbf{Cannot} be extracted in parallel, so it's very slow.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Why does \texttt{tar} layering suck?}
+		\begin{itemize}
+			\item Any metadata change causes the whole file to copied to the new layer's archive.
+			\item Layer-level deduplication is effectively useless.
+			\begin{itemize}
+				\item Any small change breaks it for the whole layer.
+				\item Not to mention that different distributions ship bit-similar software.
+			\end{itemize}
+			\item Files changed in multiple layers are extracted multiple times.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Can we do any better?}
+		\begin{itemize}
+			\item Of course!
+			\item Backup tools have solved this problem for at least a \textit{decade}.
+			\begin{itemize}
+				\item With a more clever indexed format to allow parallel extraction.
+				\item Using content-defined chunking with rolling hashes for \textbf{intra-layer} deduplication.
+				\item Content-addressable store means we can get \textbf{intra-image} deduplication.
+			\end{itemize}
+			\item And a new format means we can make it sanely extensible!
+		\end{itemize}
+	\end{frame}
+\end{document}
